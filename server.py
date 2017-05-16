@@ -1,4 +1,5 @@
 from flask import Flask, render_template, session, request
+from jinja2 import StrictUndefined
 
 app = Flask(__name__)
 
