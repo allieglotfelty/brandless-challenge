@@ -18,7 +18,7 @@ def connect_to_twitter(twitter_handle):
     # for tweet in public_tweets:
     #     print tweet.text
 
-    tweets = api.user_timeline(screen_name=twitter_handle, count=20)
+    tweets = api.user_timeline(screen_name=twitter_handle, count=100)
     for tweet in tweets:
         print tweet.text
 
