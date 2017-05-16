@@ -14,12 +14,11 @@ def connect_to_twitter(twitter_handle):
 
     api = tweepy.API(auth)
 
-    # public_tweets = api.home_timeline()
-    # for tweet in public_tweets:
-    #     print tweet.text
+    tweets_from_handle = api.user_timeline(screen_name=twitter_handle, count=5)
+    tweets_for_markov = ''
+    for tweet in tweets_from_handle:
+        tweets_for_markov += tweet.text + " "
 
-    tweets = api.user_timeline(screen_name=twitter_handle, count=100)
-    for tweet in tweets:
-        print tweet.text
+    return tweets_for_markov
 
-connect_to_twitter("@BarackObama")
+# connect_to_twitter("@BarackObama")
