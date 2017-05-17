@@ -3,7 +3,6 @@ from jinja2 import StrictUndefined
 import server_utilities
 import markov
 
-
 app = Flask(__name__)
 
 app.secret_key = 'asldfjajeiownasldknvauwaeadsfanadnvaoqpndcsdf'
@@ -23,7 +22,11 @@ def create_markov_tweet():
     """Creates Markov tweet based on tweets from the given Twitter handle."""
 
     twitter_handle = request.args.get('twitter-handle')
-    tweet_text = server_utilities.connect_to_twitter(twitter_handle)
+    try:
+        tweet_text = server_utilities.connect_to_twitter(twitter_handle)
+    except Exception:
+        return jsonify("Sorry, this user does not exist. Try again.")
+
     tweet_chains = markov.make_n_gram_chains(tweet_text, 2)
     new_tweet = markov.make_a_markov_phrase(tweet_chains)
     results = {"new_tweet": new_tweet, "twitter_handle": twitter_handle}
