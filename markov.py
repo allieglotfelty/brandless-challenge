@@ -1,3 +1,5 @@
+import random
+
 # Markov Class
 
 def make_n_gram_chains(tweet_string, n):
@@ -12,8 +14,8 @@ def make_n_gram_chains(tweet_string, n):
     chains = {}
 
     words = tweet_string.split()
-    string_length = len(words)
-    for index in range(string_length - (n - 1)):
+    number_of_words = len(words)
+    for index in range(number_of_words - (n - 1)):
         n_gram = tuple(words[index:index + n])
 
         try:
@@ -22,3 +24,30 @@ def make_n_gram_chains(tweet_string, n):
             chains[n_gram] = chains.get(n_gram, []) + [None]
 
     return chains
+
+
+def make_n_gram_text(chains, cap_at_sentence=False):
+    """Takes a dictionary of markov chains and returns a random text"""
+
+    while True:
+        phrase = random.choice(chains.keys())
+        if phrase[0][0].isupper():
+            break
+    # phrase = random.choice(chains.keys())
+    text = list(phrase)
+
+    while True:
+        word_options = chains[phrase]
+        next_word = random.choice(word_options)
+
+        if not next_word:
+            break
+        text.append(next_word)
+        if cap_at_sentence:
+            if next_word[-1] in '.?!':
+                break
+        phrase = phrase[1:] + (next_word,)
+
+    text = " ".join(text)
+
+    return text
