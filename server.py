@@ -9,7 +9,6 @@ app.secret_key = 'asldfjajeiownasldknvauwaeadsfanadnvaoqpndcsdf'
 
 app.jinja_env.undefined = StrictUndefined
 
-
 @app.route('/')
 def display_homepage():
     """Displays homepage."""
@@ -30,6 +29,7 @@ def create_markov_tweet():
     tweet_chains = markov.make_n_gram_chains(tweet_text, 2)
     new_tweet = markov.make_a_markov_phrase(tweet_chains)
     results = {"new_tweet": new_tweet, "twitter_handle": twitter_handle}
+    session[twitter_handle] = session.get(twitter_handle, []) + [new_tweet]
 
     return jsonify(results)
 
