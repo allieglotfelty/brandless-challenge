@@ -1,6 +1,7 @@
 import os
 import tweepy
 
+
 def connect_to_twitter(twitter_handle):
     """Access the Twitter API using authentication"""
 
@@ -19,6 +20,8 @@ def connect_to_twitter(twitter_handle):
     for tweet in tweets_from_handle:
         tweets_for_markov += tweet.text + " "
 
+    tweets_for_markov = tweets_for_markov.encode('ascii', 'ignore')
+    
     return tweets_for_markov
 
-# connect_to_twitter("@BarackObama")
+print connect_to_twitter("@realdonaldtrump")
