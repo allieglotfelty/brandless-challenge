@@ -48,6 +48,61 @@ def make_n_gram_text(chains, cap_at_sentence=False):
                 break
         phrase = phrase[1:] + (next_word,)
 
-    text = " ".join(text)
+    text = ' '.join(text)
 
     return text
+
+def make_a_markov_phrase(chains, char_length=140):
+    """Generates a random phrase of given character length (default is 140).
+    """
+
+    while True:
+        sentence = make_n_gram_text(chains, cap_at_sentence=True)
+        if len(sentence) <= char_length:
+            break
+        else:
+            continue
+
+    origin_sentence_words = sentence.split(' ')
+    origin_tuple = tuple(origin_sentence_words[-2:])
+    tries = 0
+
+    words_in_sentence = sentence.split(' ')
+    last_two_words = tuple(words_in_sentence[-2:])
+
+    while tries < 200:
+        word_options = chains[last_two_words]
+        next_word = random.choice(word_options)
+        tries += 1
+
+        if not next_word:
+            break
+        words_in_sentence.append(next_word)
+
+        if next_word[-1] in '.?!':
+            phrase = ' '.join(words_in_sentence)
+            if len(phrase) <= char_length:
+                return phrase
+            else:
+                last_two_words = origin_tuple
+                words_in_sentence = origin_sentence_words
+                continue
+        last_two_words = last_two_words[1:] + (next_word,)
+
+    return sentence
+    
+    # phrase = ''
+    # tries = 0
+
+    # while tries < 200:
+    #     sentence = make_n_gram_text(chains, cap_at_sentence=True)
+    #     tries += 1
+    #     if len(sentence) <= char_length:
+    #         phrase += sentence
+    #         char_length = char_length - len(sentence) - 1
+    #         if char_length == 0:
+    #             break
+    #     else:
+    #         continue
+
+    # return phrase.strip()
