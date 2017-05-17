@@ -63,7 +63,7 @@ class Markov():
         number_of_words = len(words)
 
         for index in range(number_of_words - (self.n_gram_size - 1)):
-            n_gram = tuple(words[index:index + self.n_gram_size])
+            n_gram = tuple(words[index:(index + self.n_gram_size)])
 
             try:
                 chains[n_gram] = chains.get(n_gram, []) + [words[index + self.n_gram_size]]
@@ -75,18 +75,22 @@ class Markov():
     def make_markov_sentence(self):
         """Returns a random sentence based on dictionary of user markov chains"""
 
+        # Pick random key tuple that starts with a capital letter
         while True:
             phrase = random.choice(self.markov_chains.keys())
             if phrase[0][0].isupper():
                 break
 
+        # Initialize the sentence text in as a list starting with the random tuple
         text = list(phrase)
 
+        # Continue to iterate through the dictionary and add to text until you 
+        # reach a None value or the end of a sentence, based on punctuation
         while True:
             word_options = self.markov_chains[phrase]
             next_word = random.choice(word_options)
 
-            if not next_word:
+            if next_word is None:
                 break
 
             text.append(next_word)
@@ -96,6 +100,7 @@ class Markov():
 
             phrase = phrase[1:] + (next_word,)
 
+        # Join the list of text into a string
         text = ' '.join(text)
 
         return text
@@ -103,6 +108,7 @@ class Markov():
     def make_markov_tweet(self):
         """Generates a random tweet."""
 
+        # Make a sentence less than or equal to 140 characters
         while True:
             sentence = self.make_markov_sentence()
             if len(sentence) <= 140:
@@ -110,6 +116,8 @@ class Markov():
             else:
                 continue
 
+        # Hold the original sentence in variables in case we need to refer to it
+        # In the end
         origin_sentence_words = sentence.split(' ')
         origin_tuple = tuple(origin_sentence_words[-self.n_gram_size:])
 
@@ -122,8 +130,9 @@ class Markov():
             next_word = random.choice(word_options)
             tries += 1
 
-            if not next_word:
+            if next_word is None:
                 break
+
             words_in_sentence.append(next_word)
 
             if next_word[-1] in '.?!':
@@ -134,6 +143,7 @@ class Markov():
                     last_group_of_words = origin_tuple
                     words_in_sentence = origin_sentence_words
                     continue
+
             last_group_of_words = last_group_of_words[1:] + (next_word,)
 
         return sentence
