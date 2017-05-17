@@ -1,5 +1,6 @@
 import os
 import tweepy
+import markov
 
 
 def connect_to_twitter(twitter_handle):
@@ -15,13 +16,14 @@ def connect_to_twitter(twitter_handle):
 
     api = tweepy.API(auth)
 
-    tweets_from_handle = api.user_timeline(screen_name=twitter_handle, count=5)
+    tweets_from_handle = api.user_timeline(screen_name=twitter_handle, count=500)
     tweets_for_markov = ''
     for tweet in tweets_from_handle:
         tweets_for_markov += tweet.text + " "
 
     tweets_for_markov = tweets_for_markov.encode('ascii', 'ignore')
-    
+
     return tweets_for_markov
 
-print connect_to_twitter("@realdonaldtrump")
+# print connect_to_twitter("@realdonaldtrump")
+
