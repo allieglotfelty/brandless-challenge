@@ -1,6 +1,7 @@
 from flask import Flask, render_template, jsonify, session, request
 from jinja2 import StrictUndefined
 import server_utilities
+import markov
 
 
 app = Flask(__name__)
@@ -21,12 +22,13 @@ def display_homepage():
 def create_markov_tweet():
     """Creates Markov tweet based on tweets from the given Twitter handle."""
 
-    print "I'm here"
     twitter_handle = request.args.get('twitter-handle')
-    print twitter_handle
     tweet_text = server_utilities.connect_to_twitter(twitter_handle)
+    tweet_chains = markov.make_n_gram_chains(tweet_text, 2)
+    new_tweet = markov.make_a_markov_phrase(tweet_chains)
+    results = {"new_tweet": new_tweet, "twitter_handle": twitter_handle}
 
-    return jsonify(tweet_text)
+    return jsonify(results)
 
 if __name__ == "__main__":
     app.run(port=5000, host='0.0.0.0')
