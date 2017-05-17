@@ -1,3 +1,5 @@
 env
 secrets.sh
 server_utilities.pyc
+markov.pyc
+*.pyc
