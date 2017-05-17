@@ -1,108 +1,139 @@
 import random
-
-# Markov Class
-
-def make_n_gram_chains(tweet_string, n):
-    """Takes input as a string and n as the length of the n-gram and
-    returns a dictionary of markov chains.
-
-    A chain will be a key that contains a tuple of (word1, word2,..., wordn) 
-    and the values will be a list of words that follow those n words in the
-    input string.
-    """
-
-    chains = {}
-
-    words = tweet_string.split()
-    number_of_words = len(words)
-    for index in range(number_of_words - (n - 1)):
-        n_gram = tuple(words[index:index + n])
-
-        try:
-            chains[n_gram] = chains.get(n_gram, []) + [words[index + n]]
-        except IndexError:
-            chains[n_gram] = chains.get(n_gram, []) + [None]
-
-    return chains
+import os
+import tweepy
 
 
-def make_n_gram_text(chains, cap_at_sentence=False):
-    """Takes a dictionary of markov chains and returns a random text"""
+class Markov():
+    """Markov class"""
 
-    while True:
-        phrase = random.choice(chains.keys())
-        if phrase[0][0].isupper():
-            break
-    # phrase = random.choice(chains.keys())
-    text = list(phrase)
+    def __init__(self, twitter_handle, n_gram_size=2):
+        """Initialize instance of Markov class with Twitter handle, n_gram size,
+        and dictionary of n_gram chains.
+        """
 
-    while True:
-        word_options = chains[phrase]
-        next_word = random.choice(word_options)
+        self.twitter_handle = twitter_handle
+        self.n_gram_size = n_gram_size
+        self.markov_chains = self.make_n_gram_chains()
 
-        if not next_word:
-            break
-        text.append(next_word)
-        if cap_at_sentence:
+    def __repr__(self):
+        """Provide helpful representation when printed."""
+
+        return "<Markov Twitter handle: %s n_gram_size: %s>" % (self.twitter_handle,
+                                                                self.n_gram_size
+                                                                )
+
+    def generate_twitter_text_string(self):
+        """Access the Twitter API using authentication and generate string
+        of first 500 tweets from user
+        """
+
+        consumer_key = os.environ['TWITTER_CONSUMER_KEY']
+        consumer_secret = os.environ['TWITTER_CONSUMER_SECRET']
+        access_token_key = os.environ['TWITTER_ACCESS_TOKEN']
+        access_token_secret = os.environ['TWITTER_TOKEN_SECRET']
+
+        auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+        auth.set_access_token(access_token_key, access_token_secret)
+
+        api = tweepy.API(auth)
+
+        tweets_from_handle = api.user_timeline(screen_name=self.twitter_handle,
+                                               count=500)
+        tweets_for_markov = ''
+        for tweet in tweets_from_handle:
+            tweets_for_markov += tweet.text + " "
+
+        tweets_for_markov = tweets_for_markov.encode('ascii', 'ignore')
+
+        return tweets_for_markov
+
+    def make_n_gram_chains(self):
+        """Returns a dictionary of markov chains based on the class Twitter
+        handle and n_gram size.
+
+        A chain will be a key that contains a tuple of (word1, word2,..., wordn)
+        and the values will be a list of words that follow those n words in the
+        tweet text string.
+        """
+
+        chains = {}
+
+        tweet_string = self.generate_twitter_text_string()
+        words = tweet_string.split()
+        number_of_words = len(words)
+
+        for index in range(number_of_words - (self.n_gram_size - 1)):
+            n_gram = tuple(words[index:index + self.n_gram_size])
+
+            try:
+                chains[n_gram] = chains.get(n_gram, []) + [words[index + self.n_gram_size]]
+            except IndexError:
+                chains[n_gram] = chains.get(n_gram, []) + [None]
+
+        return chains
+
+    def make_markov_sentence(self):
+        """Returns a random sentence based on dictionary of user markov chains"""
+
+        while True:
+            phrase = random.choice(self.markov_chains.keys())
+            if phrase[0][0].isupper():
+                break
+
+        text = list(phrase)
+
+        while True:
+            word_options = self.markov_chains[phrase]
+            next_word = random.choice(word_options)
+
+            if not next_word:
+                break
+
+            text.append(next_word)
+
             if next_word[-1] in '.?!':
                 break
-        phrase = phrase[1:] + (next_word,)
 
-    text = ' '.join(text)
+            phrase = phrase[1:] + (next_word,)
 
-    return text
+        text = ' '.join(text)
 
-def make_a_markov_phrase(chains, char_length=140):
-    """Generates a random phrase of given character length (default is 140).
-    """
+        return text
 
-    while True:
-        sentence = make_n_gram_text(chains, cap_at_sentence=True)
-        if len(sentence) <= char_length:
-            break
-        else:
-            continue
+    def make_markov_tweet(self):
+        """Generates a random tweet."""
 
-    origin_sentence_words = sentence.split(' ')
-    origin_tuple = tuple(origin_sentence_words[-2:])
-    tries = 0
-
-    words_in_sentence = sentence.split(' ')
-    last_two_words = tuple(words_in_sentence[-2:])
-
-    while tries < 200:
-        word_options = chains[last_two_words]
-        next_word = random.choice(word_options)
-        tries += 1
-
-        if not next_word:
-            break
-        words_in_sentence.append(next_word)
-
-        if next_word[-1] in '.?!':
-            phrase = ' '.join(words_in_sentence)
-            if len(phrase) <= char_length:
-                return phrase
+        while True:
+            sentence = self.make_markov_sentence()
+            if len(sentence) <= 140:
+                break
             else:
-                last_two_words = origin_tuple
-                words_in_sentence = origin_sentence_words
                 continue
-        last_two_words = last_two_words[1:] + (next_word,)
 
-    return sentence
-    
-    # phrase = ''
-    # tries = 0
+        origin_sentence_words = sentence.split(' ')
+        origin_tuple = tuple(origin_sentence_words[-self.n_gram_size:])
 
-    # while tries < 200:
-    #     sentence = make_n_gram_text(chains, cap_at_sentence=True)
-    #     tries += 1
-    #     if len(sentence) <= char_length:
-    #         phrase += sentence
-    #         char_length = char_length - len(sentence) - 1
-    #         if char_length == 0:
-    #             break
-    #     else:
-    #         continue
+        words_in_sentence = sentence.split(' ')
+        last_group_of_words = tuple(words_in_sentence[-self.n_gram_size:])
+        tries = 0
 
-    # return phrase.strip()
+        while tries < 1000:
+            word_options = self.markov_chains[last_group_of_words]
+            next_word = random.choice(word_options)
+            tries += 1
+
+            if not next_word:
+                break
+            words_in_sentence.append(next_word)
+
+            if next_word[-1] in '.?!':
+                phrase = ' '.join(words_in_sentence)
+                if len(phrase) <= 140:
+                    return phrase
+                else:
+                    last_group_of_words = origin_tuple
+                    words_in_sentence = origin_sentence_words
+                    continue
+            last_group_of_words = last_group_of_words[1:] + (next_word,)
+
+        return sentence
