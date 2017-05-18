@@ -2,9 +2,9 @@
 
 
 # Description
-The Markov Chain Tweeter takes in a Twitter handle from the user and then generates a random tweet based on the Twitter users prior tweets.
+The Markov Chain Tweeter takes in a Twitter handle from the user and then generates a random tweet based on the Twitter users prior tweets. All tweets are cached on the server. 
 
-![alt text](https://github.com/allieglotfelty/alt-school-challenge/blob/master/README/ColorGrid.gif?raw=true "ColorGrid gif")
+![alt text](https://github.com/allieglotfelty/brandless-challenge/blob/master/README/b_challenge.gif?raw=true "Markov gif")
 
 
 # Technologies
