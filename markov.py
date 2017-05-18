@@ -24,7 +24,7 @@ class Markov():
 
     def generate_twitter_text_string(self):
         """Access the Twitter API using authentication and generate string
-        of first 500 tweets from user
+        of first 500 tweets from user timeline.
         """
 
         consumer_key = os.environ['TWITTER_CONSUMER_KEY']
@@ -58,10 +58,14 @@ class Markov():
 
         chains = {}
 
+        # Generate string of words from users tweets
         tweet_string = self.generate_twitter_text_string()
+
+        # Create list of words from user tweets
         words = tweet_string.split()
         number_of_words = len(words)
 
+        # Iterate over list and create dictionary of word tuples (i.e. n_grams)
         for index in range(number_of_words - (self.n_gram_size - 1)):
             n_gram = tuple(words[index:(index + self.n_gram_size)])
 
@@ -116,15 +120,20 @@ class Markov():
             else:
                 continue
 
-        # Hold the original sentence in variables in case we need to refer to it
-        # In the end
+        # Hold the original sentence in variables in case we need to refer to it below
         origin_sentence_words = sentence.split(' ')
         origin_tuple = tuple(origin_sentence_words[-self.n_gram_size:])
 
+        # Create new variables to update and add to original sentence
         words_in_sentence = sentence.split(' ')
         last_group_of_words = tuple(words_in_sentence[-self.n_gram_size:])
+
+        # Initialize number of tries to get our tweet close to 140 characters
         tries = 0
 
+        # Continue to iterate through the dictionary and add to text until you 
+        # reach a None value or the end of a sentence, based on punctuation
+        # Returns added phrase if under 140 characters
         while tries < 1000:
             word_options = self.markov_chains[last_group_of_words]
             next_word = random.choice(word_options)
@@ -146,4 +155,5 @@ class Markov():
 
             last_group_of_words = last_group_of_words[1:] + (next_word,)
 
+        # Otherwise, return original sentence
         return sentence
