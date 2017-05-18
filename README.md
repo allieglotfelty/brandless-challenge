@@ -38,6 +38,27 @@ Install the dependencies:
 pip install -r requirements.txt
 ```
 
+Login or create a Twitter account at https://twitter.com/
+
+Create a new Twitter app at https://apps.twitter.com
+
+Create your access token
+
+Add your API Key, API Secret, Access Token, and Access Token Secret to a secrets.sh file using this format:
+
+```
+export TWITTER_CONSUMER_KEY="Your_Consumer_Key_Goes_Here"
+export TWITTER_CONSUMER_SECRET="Your_Consumer_Secret_Goes_Here"
+export TWITTER_ACCESS_TOKEN="Your_Twitter_Access_Token_Goes_Here"
+export TWITTER_TOKEN_SECRET="Your_Twitter_Token_Secret_Goes_Here"
+```
+
+Source your keys from your secrets.sh file into your virtual environment
+
+```sh
+source secrets.sh
+```
+
 Run the app:
 ```sh
 python server.py
